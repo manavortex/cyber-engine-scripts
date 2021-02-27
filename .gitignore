@@ -1,0 +1,7 @@
+# Ignore everything
+*
+
+# But not these files...
+!*/
+!.gitignore
+!/bin/x64/plugins/cyber_engine_tweaks/mods/addAllRecipes/**
