@@ -570,17 +570,6 @@ local otherIds = {
 	-- TweakDBID.new('Items.Cop_01_Set_Boots'),
 }
 
-function giveItem(stringId, player, txsys, gameItemID)	
-	
-	-- conditionally register if they've been passed as nil
-	player 		= player 		or Game.GetPlayer();  
-	txsys 		= txsys 		or Game.GetTransactionSystem();
-	gameItemId 	= gameItemID 	or GetSingleton("gameItemID");	
-	
-	local id = gameItemID:FromTDBID(stringId);
-	local result = txsys:GiveItem(player, id, 1);
-end
-
 function AddAllRecipes:new()
 
 	setmetatable(AddAllRecipes, self)
@@ -588,18 +577,34 @@ function AddAllRecipes:new()
 	self.txsys = nil
 	self.player = nil
 	self.gameItemID = nil
+	self.craftingSystem = nil
+	
+	local function isRecipeKnown(itemTweakDBID)		
+		local playerCraftBook = self.craftingSystem:GetPlayerCraftBook()
+		return (self.craftingSystem:IsRecipeKnown(itemTweakDBID, playerCraftBook))
+	end
+	
+	local function giveItem(stringId)		
+		local id = self.gameItemID:FromTDBID(stringId);
+		if isRecipeKnown(stringId) then 
+			print(stringId .. " known")
+		else
+			local result = self.txsys:GiveItem(self.player, id, 1);
+		end
+	end
 
 	registerForEvent("onInit", function()
 		self.txsys = Game.GetTransactionSystem();
 		self.player = Game.GetPlayer();
 		self.gameItemID = GetSingleton("gameItemID")		
-
+		self.craftingSystem = Game.GetScriptableSystemsContainer():Get(CName.new('CraftingSystem'))
+		
 		for _, recipeId in ipairs(recipeIds) do  
-			giveItem( recipeId, self.player, self.txsys, self.gameItemID);  
+			giveItem( recipeId);
 		end
 		
 		for _, recipeId in ipairs(otherIds) do  
-			giveItem( recipeId, self.player, self.txsys, self.gameItemID);  
+			giveItem( recipeId);  
 		end
     end)
 
