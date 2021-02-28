@@ -1,4 +1,3 @@
-
 AddAllRecipes = {
 	description = "adds all crafting specs to player inventory on load",
 	rootPath = "addAllRecipes",
@@ -579,18 +578,21 @@ function AddAllRecipes:new()
 	self.gameItemID = nil
 	self.craftingSystem = nil
 	
-	local function isRecipeKnown(itemTweakDBID)		
+	local function isRecipeKnown(tweakDBID)		
 		local playerCraftBook = self.craftingSystem:GetPlayerCraftBook()
-		return (self.craftingSystem:IsRecipeKnown(itemTweakDBID, playerCraftBook))
+		return (self.craftingSystem:IsRecipeKnown(tweakDBID, playerCraftBook))
 	end
 	
-	local function giveItem(stringId)		
-		local id = self.gameItemID:FromTDBID(stringId);
-		if isRecipeKnown(stringId) then 
-			print(stringId .. " known")
-		else
-			local result = self.txsys:GiveItem(self.player, id, 1);
+	local function giveItem(tweakDBID)		
+		local id = self.gameItemID:FromTDBID(tweakDBID);
+		-- if isRecipeKnown(tweakDBID) then 
+		-- 	print(tweakDBID .. " known")
+		-- else
+		local result = self.txsys:GiveItem(self.player, id, 1);
+		if not result then
+			print("could not add item " .. tweakDBID .. ", please provide a copy of addAllRecipes.log with your nexus bug report")
 		end
+		-- end
 	end
 
 	registerForEvent("onInit", function()
